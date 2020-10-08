@@ -70,7 +70,7 @@ proc create_report { reportName command } {
   }
 }
 OPTRACE "synth_1" START { ROLLUP_AUTO }
-set_param chipscope.maxJobs 2
+set_param chipscope.maxJobs 3
 set_param xicom.use_bs_reader 1
 OPTRACE "Creating in-memory project" START { }
 create_project -in_memory -part xc7a35ticsg324-1L
@@ -94,7 +94,7 @@ read_verilog -library xil_defaultlib {
   C:/Users/devin/Workspaces/VivadoWorkspace/SharedVivado/SPI_slave.v
   C:/Users/devin/Workspaces/VivadoWorkspace/waveform_capture/waveform_capture.srcs/sources_1/new/waveform_capture_top.v
 }
-read_ip -quiet c:/Users/devin/Workspaces/VivadoWorkspace/waveform_capture/waveform_capture.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0.xci
+read_ip -quiet C:/Users/devin/Workspaces/VivadoWorkspace/waveform_capture/waveform_capture.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0.xci
 set_property used_in_implementation false [get_files -all c:/Users/devin/Workspaces/VivadoWorkspace/waveform_capture/waveform_capture.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0_board.xdc]
 set_property used_in_implementation false [get_files -all c:/Users/devin/Workspaces/VivadoWorkspace/waveform_capture/waveform_capture.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0.xdc]
 set_property used_in_implementation false [get_files -all c:/Users/devin/Workspaces/VivadoWorkspace/waveform_capture/waveform_capture.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0_ooc.xdc]

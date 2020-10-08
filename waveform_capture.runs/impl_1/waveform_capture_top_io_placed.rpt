@@ -1,8 +1,8 @@
 Copyright 1986-2020 Xilinx, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------
 | Tool Version              : Vivado v.2020.1 (win64) Build 2902540 Wed May 27 19:54:49 MDT 2020
-| Date                      : Mon Oct  5 16:13:12 2020
-| Host                      : DESKTOP-G37N9KT running 64-bit major release  (build 9200)
+| Date                      : Wed Oct  7 11:14:43 2020
+| Host                      : DESKTOP-OJFSORI running 64-bit major release  (build 9200)
 | Command                   : report_io -file waveform_capture_top_io_placed.rpt
 | Design                    : waveform_capture_top
 | Device                    : xc7a35ti

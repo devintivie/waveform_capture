@@ -85,13 +85,17 @@ clk_wiz_0 clk_gen(
 integer i;
 localparam  WAVEFORM_DATA_BASE =  12'h000,
             WAVEFORM_DATA_COUNT = 160;    
-localparam  WAVEFORM_DEPTH = 20000;
+localparam  WAVEFORM_DEPTH = 32;
+localparam  OUTPUT_DIVIDER = 20;
 reg [15:0]  waveform_data_reg[0:WAVEFORM_DATA_COUNT];
 reg [15:0]  waveform_data_next[0:WAVEFORM_DATA_COUNT];
 
-reg [(WAVEFORM_DEPTH-1):0] Inputr;        //REGISTER USED FOR FPGA SYNC
-wire input_rising_edge = (Inputr[1:0] == 2'b01);
-wire input_falling_edge = (Inputr[1:0] == 2'b10);
+reg [(WAVEFORM_DEPTH-1):0] input_data_reg, input_data_next;
+
+//reg [(WAVEFORM_DEPTH-1):0] Inputr;        //REGISTER USED FOR FPGA SYNC
+
+//wire input_rising_edge = (Inputr[1:0] == 2'b01);
+//wire input_falling_edge = (Inputr[1:0] == 2'b10);
 
 //SPI SLAVE PI #1
 SPI_slave 
@@ -135,7 +139,14 @@ DualPortRamCtrl DPRC(
 //Sync signals to FPGA clock
 always @(posedge clk20MHz)
 begin
-    Inputr <= {Inputr[(WAVEFORM_DEPTH-2):0], input1};
+//    Inputr <= {Inputr[(WAVEFORM_DEPTH-2):0], input1};
+    input_data_reg <= input_data_next;
+end
+
+always@*
+begin
+    input_data_next = {input_data_reg[(WAVEFORM_DEPTH-2):0], input1};
+
 end
 
 
@@ -147,9 +158,26 @@ end
 
 always@*
 begin
-    output_counter_next = output_counter_reg;
+//    output_counter_next = output_counter_reg;
+    output_next = output_reg;
+    if(output_counter_reg == (OUTPUT_DIVIDER-1))
+    begin
+        output_counter_next = 16'd0;
+    end
+    else
+    begin
+        output_counter_next = output_counter_reg + 1;
+    end
     
-    output_next = ~output_reg;
+    if(output_counter_reg < OUTPUT_DIVIDER/2)
+    begin
+        output_next = 1'b1;
+    end
+    else
+    begin
+        output_next = 1'b0;
+    end
+    
 end
        
 
@@ -174,8 +202,8 @@ begin
         MAX_SPI_ADDR - 1 : SPI_DataOut = VERSION_reg;
         MAX_SPI_ADDR : SPI_DataOut = ID_reg;        
         
-        WAVEFORM_DATA_BASE + 8'd0 : SPI_DataOut = waveform_data_reg[0];
-        WAVEFORM_DATA_BASE + 8'd1 : SPI_DataOut = waveform_data_reg[1];
+        WAVEFORM_DATA_BASE + 8'd0 : SPI_DataOut = input_data_reg[15:0];
+        WAVEFORM_DATA_BASE + 8'd1 : SPI_DataOut = input_data_reg[31:16];
         WAVEFORM_DATA_BASE + 8'd2 : SPI_DataOut = waveform_data_reg[2];
         WAVEFORM_DATA_BASE + 8'd3 : SPI_DataOut = waveform_data_reg[3];
         WAVEFORM_DATA_BASE + 8'd4 : SPI_DataOut = waveform_data_reg[4];
@@ -340,17 +368,17 @@ begin
 end
     
 //REGISTERS LOGIC STATE CHANGE 
-always@*
-begin
-    for(i = 0; i < WAVEFORM_DATA_COUNT; i = i + 1)
-    begin
-        waveform_data_next[i] = waveform_data_reg[i];
-    end    
+//always@*
+//begin
+//    for(i = 0; i < WAVEFORM_DATA_COUNT; i = i + 1)
+//    begin
+//        waveform_data_next[i] = waveform_data_reg[i];
+//    end    
     
-    waveform_data_next[0] = Inputr[15:0];
-    waveform_data_next[1] = Inputr[31:16];
-    waveform_data_next[2] = Inputr[47:32];
-    waveform_data_next[3] = Inputr[63:48];
+//    waveform_data_next[0] = Inputr[15:0];
+//    waveform_data_next[1] = Inputr[31:16];
+//    waveform_data_next[2] = Inputr[47:32];
+//    waveform_data_next[3] = Inputr[63:48];
     
 //    //Add Global Reset Logic?
 //    if(DPR_Enable && DPR_WriteEnable)
@@ -519,7 +547,7 @@ begin
 //            WAVEFORM_DATA_BASE + 8'd159 : waveform_data_next[159] = DPR_DataIn;
 //        endcase
 //    end
-end
+//end
 
 assign MISO_out = MISO;         //CONNECT MISO OUTPUT TO MISO HOLDER
 assign output1 = output_reg;
